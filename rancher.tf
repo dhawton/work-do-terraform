@@ -1,3 +1,10 @@
+data "template_file" "cloud-init-yaml" {
+  template = file("${path.module}/files/cloud-init.yaml")
+  vars = {
+    init_ssh_public_key = file(var.pub_key_file)
+  }
+}
+
 resource "digitalocean_droplet" "rancher" {
   image = "debian-10-x64"
   name = "rancher"
@@ -7,31 +14,17 @@ resource "digitalocean_droplet" "rancher" {
   ssh_keys = [
     data.digitalocean_ssh_key.terraform.id
   ]
-  connection {
-    host = self.ipv4_address
-    user = "root"
-    type = "ssh"
-    private_key = file(var.pvt_key)
-    timeout = "2m"
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "export PATH=$PATH:/usr/bin",
-      "sudo apt-get update",
-      "sudo apt upgrade -y",
-      "sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release",
-      "curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg",
-      "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable\" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null",
-      "sudo apt-get update",
-      "sudo apt-get install -y docker-ce docker-ce-cli containerd.io",
-      "sudo docker run -d --restart=unless-stopped -p 80:80 -p 443:443 -v /opt/rancher:/var/lib/rancher --privileged rancher/rancher:latest --acme-domain rancher.crowk.com"
-    ]
-  }
+  user_data = data.template_file.cloud-init-yaml.rendered
 }
 
 resource "digitalocean_record" "rancher" {
   domain = "crowk.com"
   type = "A"
   name = "rancher"
+  ttl = 180
+  value = digitalocean_droplet.rancher.ipv4_address
+}
+
+output "public_ip_server" {
   value = digitalocean_droplet.rancher.ipv4_address
 }

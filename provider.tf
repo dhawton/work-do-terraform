@@ -9,6 +9,7 @@ terraform {
 
 variable "do_token" {}
 variable "pvt_key" {}
+variable "pub_key_file" {}
 
 provider "digitalocean" {
   token = var.do_token
