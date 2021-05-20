@@ -30,3 +30,5 @@ terraform.rc
 
 # Ignore plans
 *.out
+
+*.private
