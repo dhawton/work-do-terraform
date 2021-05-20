@@ -1,8 +1,8 @@
 #cloud-config
 
 timezone: America/Los_Angeles
-#disable_root: true
-#ssh_pwauth: false
+disable_root: true
+ssh_pwauth: false
 
 %{ if debian_testing }
 # This is mostly because Debian seems to be using the old config item by default
