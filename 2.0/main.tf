@@ -28,7 +28,6 @@ resource "linode_instance" "rancher" {
     region = var.instance_region
     type = var.instance_type
     private_ip = true
-    root_pass = "ThisIsATest!@#123"
     stackscript_id = linode_stackscript.cloudinit_stackscript.id
 
     stackscript_data = {
