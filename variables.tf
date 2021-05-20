@@ -20,6 +20,12 @@ variable "instance_image" {
     default = "linode/debian10"
 }
 
+variable "instance_testing" {
+    type = bool
+    description = "Should we use the testing apt repos"
+    default = false
+}
+
 variable "instance_region" {
     type = string
     description = "Region"

@@ -21,6 +21,11 @@ variable "instance_region" {
     default = "us-west"
 }
 
+# Use testing apt repos
+variable "instance_testing" {
+    default = true
+}
+
 # Users
 variable "ssh_users" {
     default = [

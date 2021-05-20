@@ -1,8 +1,28 @@
 #cloud-config
 
 timezone: America/Los_Angeles
-disable_root: true
-ssh_pwauth: false
+#disable_root: true
+#ssh_pwauth: false
+
+%{ if debian_testing }
+# This is mostly because Debian seems to be using the old config item by default
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=967935
+apt_preserve_sources_list: false
+
+apt:
+  preserve_sources_list: false
+  sources_list: |
+    deb $MIRROR testing main contrib non-free
+    deb-src $MIRROR testing main
+    deb $PRIMARY $RELEASE universe
+  conf: |
+    APT {
+      Get {
+        Assume-Yes 'true';
+        Fix-Broken 'true';
+      }
+    }
+%{ endif }
 
 package_update: true
 package_upgrade: true
