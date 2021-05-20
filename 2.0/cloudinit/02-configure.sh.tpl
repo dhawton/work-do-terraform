@@ -36,7 +36,15 @@ function get_github_keys() {
     return 0
 }
 
+echo "Configuring ssh keys."
+
 %{ for user in ssh_users ~}
+echo "Configuring ssh keys for ${user.username}."
 authorized_keys_file=$(setup_authorized_keys "${user.username}")
 get_github_keys "${user.github_username}" "$${authorized_keys_file}"
 %{ endfor ~}
+
+echo "Done."
+
+echo "Configuring hostname."
+hostnamectl set-hostname "$${hostname}"

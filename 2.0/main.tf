@@ -40,6 +40,7 @@ resource "linode_domain_record" "rancherrecord" {
     name = var.instance_name
     record_type = "A"
     target = linode_instance.rancher.ip_address
+    ttl_sec = 300
 }
 
 variable "linode_token" {}
