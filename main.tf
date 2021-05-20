@@ -27,6 +27,7 @@ resource "linode_instance" "rancher" {
     type = var.instance_type
     private_ip = true
     stackscript_id = linode_stackscript.cloudinit_stackscript.id
+    root_pass = var.debugging ? var.root_pass : ""
 
     stackscript_data = {
       "userdata" = data.template_cloudinit_config.config.rendered
@@ -42,3 +43,4 @@ resource "linode_domain_record" "rancherrecord" {
 }
 
 variable "linode_token" {}
+variable "root_pass" {}

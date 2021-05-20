@@ -9,7 +9,8 @@ data "template_cloudinit_config" "config" {
             instance = var.instance_name,
             domain = "${var.instance_name}.${var.rootdomain}",
             ssh_users = var.ssh_users,
-            debian_testing = var.instance_testing
+            debian_testing = var.instance_testing,
+            debugging = var.debugging
         })
     }
     part {

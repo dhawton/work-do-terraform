@@ -26,6 +26,12 @@ variable "instance_testing" {
     default = false
 }
 
+variable "debugging" {
+    type = bool
+    description = "Should be used: almost never"
+    default = false
+}
+
 variable "instance_region" {
     type = string
     description = "Region"
