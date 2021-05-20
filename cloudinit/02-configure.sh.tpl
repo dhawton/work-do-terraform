@@ -46,5 +46,5 @@ get_github_keys "${user.github_username}" "$${authorized_keys_file}"
 
 echo "Done."
 
-echo "Configuring hostname."
-hostnamectl set-hostname "$${hostname}"
+echo "Configuring hostname ${hostname}."
+hostnamectl set-hostname "${hostname}"
