@@ -73,14 +73,19 @@ hlm repo add jetstack https://charts.jetstack.io
 hlm repo update
 
 log "Installing cert-manager..."
+kc create namespace cert-manager
+kc apply -f https://github.com/jetstack/cert-manager/releases/download/v1.4.0/cert-manager.yaml
 hlm install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
-  --create-namespace \
-  --version v1.4.0 \
-  --set installCRDs=true
+  --version v1.4.0
 
 log "Waiting for deployment..."
 kc -n cert-manager rollout status deploy/cert-manager
+kc -n cert-manager rollout status deploy/cert-manager-webhook
+kc -n cert-manager rollout status deploy/cert-manager-cainjector
+
+log "Giving cert-manager more time to finish deploying"
+sleep 30
 
 log "Creating cattle-system namespace"
 kc create namespace cattle-system

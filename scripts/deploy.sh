@@ -23,6 +23,8 @@ waiting=1
 
 echo "Waiting for docker to be installed..."
 
+sleep 10
+
 while [[ $waiting == 1 ]]; do
     ssh -o "StrictHostKeyChecking=no" -l $(cat .ssh_user) ${hostname}.do.support.rancher.space docker container ls &>/dev/null
     if [[ $? -eq 0 ]]; then
