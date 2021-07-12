@@ -1,29 +1,21 @@
 # Name of the instance
 variable "instance_name" {
-    default = "rancher"
+    default = "daniel-rancher"
 }
 
 # Type of VM
-# https://api.linode.com/v4/linode/types
 variable "instance_type" {
-    default = "g6-standard-2"
+    default = "s-2vcpu-4gb"
 }
 
 # Image to use
-# https://api.linode.com/v4/images
 variable "instance_image" {
-    default = "linode/debian10"
+    default = "ubuntu-18-04-x64"
 }
 
 # Instance Region
-# https://api.linode.com/v4/regions
 variable "instance_region" {
-    default = "us-west"
-}
-
-# Use testing apt repos
-variable "instance_testing" {
-    default = true
+    default = "sfo3"
 }
 
 # Users

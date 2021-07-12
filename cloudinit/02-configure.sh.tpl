@@ -48,3 +48,13 @@ echo "Done."
 
 echo "Configuring hostname ${hostname}."
 hostnamectl set-hostname "${hostname}"
+
+echo "Installing Docker"
+curl https://releases.rancher.com/install-docker/20.10.sh |bash
+systemctl start docker
+systemctl enable docker
+
+%{ for user in ssh_users ~}
+echo "Adding ${user.username} to docker group."
+usermod -aG docker ${user.username}
+%{ endfor ~}

@@ -1,23 +1,23 @@
 locals {
-    rootdomain = var.rootdomain != "" ? var.rootdomain : "hawton.dev"
+    rootdomain = var.rootdomain != "" ? var.rootdomain : "do.support.rancher.space"
 }
 
 variable "instance_name" {
     type = string
     description = "Enter a unique name for the instance"
-    default = "rancher"
+    default = "daniel-rancher"
 }
 
 variable "instance_type" {
     type = string
     description = "Instance type from Linode"
-    default = ""
+    default = "s-2vcpu-4gb"
 }
 
 variable "instance_image" {
     type = string
     description = "Operating System"
-    default = "linode/debian10"
+    default = "ubuntu-18-04-x64"
 }
 
 variable "instance_testing" {
@@ -35,7 +35,7 @@ variable "debugging" {
 variable "instance_region" {
     type = string
     description = "Region"
-    default = "us-west"
+    default = "sfo3"
 }
 
 variable "ssh_users" {
@@ -59,11 +59,5 @@ variable "ssh_users" {
 variable "rootdomain" {
     type = string
     description = "Domain to use"
-    default = "hawton.dev"
-}
-
-variable "rootdomain_id" {
-    type = string
-    description = "ID of zone"
-    default = "1584103"
+    default = "do.support.rancher.space"
 }
