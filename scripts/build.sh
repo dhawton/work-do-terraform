@@ -1,6 +1,9 @@
 #!/bin/bash
 
-. common.sh
+script=$(readlink -f "$0")
+mypath=$(dirname "$script")
+
+. $mypath/common.sh
 
 project=$1
 basedir="$HOME/work/terraform/"
@@ -13,17 +16,24 @@ if [[ ! -d $basedir ]]; then
   mkdir -p $basedir
 fi
 
+if [[ -d "$basedir$project" ]]; then
+  echo "Directory $basedir$project exists, cannot continue with building..."
+  exit 1
+fi
+
 check_exists git
 
 echo "Cloning base..."
 
 git clone https://github.com/dhawton/work-do-terraform $basedir$project
+
 cd $basedir$project
 
 do_token=""
 
-if [[ -f "~/.digitalocean" ]]; then
-  do_token=$(cat ~/.digitalocean)
+if [[ -f "$HOME/.digitalocean" ]]; then
+  echo "Found digital ocean key where expected, loading"
+  do_token=$(cat $HOME/.digitalocean)
 fi
 
 echo "Configuration time:"
@@ -84,3 +94,5 @@ do_token = "$do_token"
 
 echo $instance_name > .instance_name
 echo $ssh_username > .ssh_user
+
+echo "To continue, cd $basedir$project and run the deployer"
