@@ -18,7 +18,7 @@ if [[ $? -ne "0" ]]; then
   exit 1
 fi
 
-hostname=$(cat .instance_name)
+hostname=$instance_name
 
 waiting=1
 
@@ -33,7 +33,7 @@ fi
 sleep 10
 
 while [[ $waiting == 1 ]]; do
-    ssh -o \"StrictHostKeyChecking=no\" -l $(cat .ssh_user) ${hostname}.do.support.rancher.space $ssh_cmd &>/dev/null
+    ssh -o \"StrictHostKeyChecking=no\" -l $ssh_username ${hostname}.do.support.rancher.space $ssh_cmd &>/dev/null
     if [[ $? -eq 0 ]]; then
         echo "SSH appears ready to move on"
         break

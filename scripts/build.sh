@@ -104,7 +104,4 @@ use_rke=$use_rke
 install_rancher=$install_rancher
 !VARIABLES!OVERRIDE!
 
-echo $instance_name > .instance_name
-echo $ssh_username > .ssh_user
-
 echo "To continue, cd $basedir$project and run the deployer"
