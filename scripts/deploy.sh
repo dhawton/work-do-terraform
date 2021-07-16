@@ -18,22 +18,17 @@ if [[ $? -ne "0" ]]; then
   exit 1
 fi
 
-hostname=$instance_name
-
-waiting=1
-
 echo "Waiting for cloud-init to complete..."
+ssh_cmd="echo 1"
 
 if [[ $use_rke == "y" ]]; then
   ssh_cmd="docker container ls"
-else
-  ssh_cmd="echo 1"
 fi
 
 sleep 10
 
-while [[ $waiting == 1 ]]; do
-    ssh -o \"StrictHostKeyChecking=no\" -l $ssh_username ${hostname}.do.support.rancher.space $ssh_cmd &>/dev/null
+while true; do
+    ssh -o \"StrictHostKeyChecking=no\" -l $ssh_username ${instance_name}.do.support.rancher.space $ssh_cmd &>/dev/null
     if [[ $? -eq 0 ]]; then
         echo "SSH appears ready to move on"
         break
@@ -43,8 +38,8 @@ done
 
 if [[ $use_rke == "y" ]]; then
   cd rke
-  bash gen-cluster.sh $hostname do.support.rancher.space $ssh_username $install_rancher
+  bash gen-cluster.sh $instance_name do.support.rancher.space $ssh_username $install_rancher
 else
   echo "Not configured to use RKE... so we're done here."
-  echo "Server is up at ${hostname}.do.support.rancher.space"
+  echo "Server is up at ${instance_name}.do.support.rancher.space"
 fi
