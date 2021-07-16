@@ -1,12 +1,14 @@
 #!/bin/bash
 
-if [[ "$2" == "" ]]; then
+if [[ "$3" == "" ]]; then
   echo "Missing params"
   exit 1
 fi
 
 my_hostname=$1
 domain=$2
+ssh_username=$3
+install_rancher=$4
 ipv4=$(dig +short $my_hostname.$2)
 internal_ipv4=$(dig +short ${my_hostname}.i.$domain)
 
@@ -32,7 +34,7 @@ nodes:
   - worker
   - etcd
   hostname_override: $my_hostname.$domain
-  user: daniel
+  user: $ssh_username
   docker_socket: /var/run/docker.sock
   ssh_key_path: ~/.ssh/id_ecdsa
 !TEMPLATE!
@@ -61,6 +63,11 @@ if [[ ! -f "kube_config_cluster.yml" ]]; then
 fi
 
 chmod 600 kube_config_cluster.yml
+
+if [[ $install_rancher == "n" ]]; then
+  echo "Not configured to install rancher, we're done here."
+  exit 0
+fi
 
 log "Adding rancher chart, likely to already exist..."
 hlm repo add rancher-latest https://releases.rancher.com/server-charts/latest
