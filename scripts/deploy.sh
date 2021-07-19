@@ -28,7 +28,7 @@ fi
 sleep 10
 
 while true; do
-    ssh -o \"StrictHostKeyChecking=no\" -l $ssh_username ${instance_name}.do.support.rancher.space $ssh_cmd &>/dev/null
+    ssh -o "StrictHostKeyChecking=no" -l $ssh_username ${instance_name}.do.support.rancher.space $ssh_cmd &>/dev/null
     if [[ $? -eq 0 ]]; then
         echo "SSH appears ready to move on"
         break
