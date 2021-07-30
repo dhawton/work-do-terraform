@@ -1,18 +1,15 @@
 #!/bin/bash
 
+. ../buildconfig.sh
+
 if [[ "$3" == "" ]]; then
   echo "Missing params"
   exit 1
 fi
 
-my_hostname=$1
-domain=$2
-ssh_username=$3
-install_rancher=$4
-ipv4=$(dig +short $my_hostname.$2)
-internal_ipv4=$(dig +short ${my_hostname}.i.$domain)
+ipv4=$(dig +short ${instance_name}.${domain_name})
 
-ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$my_hostname.$domain" &>/dev/null
+ssh-keygen -f "$HOME/.ssh/known_hosts" -R "${instance_name}.${domain_name}" &>/dev/null
 ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$ipv4" &>/dev/null
 
 if [[ -f "cluster.rkestate" ]]; then
@@ -24,19 +21,24 @@ if [[ -f "kube_config_cluster.yml" ]]; then
   rm kube_config_cluster.yml
 fi
 
+kubernetes_version=""
+if [[ ${k8s_version} != "latest" ]]; then
+  kubernetes_version=$k8s_version
+fi
+
 cat >cluster.yml <<!TEMPLATE!
 nodes:
 - address: $ipv4
   port: "22"
-  internal_address: $internal_ipv4
   role:
   - controlplane
   - worker
   - etcd
-  hostname_override: $my_hostname.$domain
+  hostname_override: ${instance_name}.${domain_name}
   user: $ssh_username
   docker_socket: /var/run/docker.sock
-  ssh_key_path: ~/.ssh/id_ecdsa
+  ssh_key_path: $ssh_key
+kubernetes_version: $kubernetes_version
 !TEMPLATE!
 
 echo "Saved to cluster.yml"
@@ -97,16 +99,22 @@ sleep 30
 log "Creating cattle-system namespace"
 kc create namespace cattle-system
 
+rancher_arg=""
+if [[ $rancher_version != "latest" ]]; then
+  rancher_arg="--version ${rancer_version}"
+fi
+
 log "Installing Rancher from charts"
 hlm install rancher rancher-latest/rancher \
   --namespace cattle-system \
-  --set hostname=$my_hostname.$domain \
+  --set hostname=${instance_name}.${domain_name} \
   --set replicas=1 \
   --set ingress.tls.source=letsEncrypt \
-  --set letsEncrypt.email=daniel.hawton@suse.com
+  --set letsEncrypt.email=daniel.hawton@suse.com \
+  $ranger_arg
 
 log "Waiting for Rancher deployment"
 kc -n cattle-system rollout status deploy/rancher
 
 log "Done."
-echo "You can access the install at https://$my_hostname.$domain"
+echo "You can access the install at https://${instance_name}.${domain_name}"

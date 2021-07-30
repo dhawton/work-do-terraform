@@ -38,7 +38,7 @@ done
 
 if [[ $use_rke == "y" ]]; then
   cd rke
-  bash gen-cluster.sh $instance_name do.support.rancher.space $ssh_username $install_rancher
+  bash gen-cluster.sh $instance_name  $ssh_username $install_rancher
 else
   echo "Not configured to use RKE... so we're done here."
   echo "Server is up at ${instance_name}.do.support.rancher.space"
