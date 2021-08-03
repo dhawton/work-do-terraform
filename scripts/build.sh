@@ -111,6 +111,7 @@ cat >buildconfig.sh <<!VARIABLES!OVERRIDE!
 instance_name=$instance_name
 domain_name=$domain_name
 ssh_username=$ssh_username
+ssh_key=$ssh_key
 use_rke=$use_rke
 k8s_version=$k8s_version
 install_rancher=$install_rancher
