@@ -50,27 +50,27 @@ output "node3_name" {
 }
 
 output "node1_ip" {
-    value = digitalocean_droplet.node01.ip
+    value = digitalocean_droplet.node01.ipv4_address
 }
 
 output "node1_internal_ip" {
-    value = digitalocean_droplet.node01.private_ip
+    value = digitalocean_droplet.node01.ipv4_address_private
 }
 
 output "node2_ip" {
-    value = digitalocean_droplet.node02.ip
+    value = digitalocean_droplet.node02.ipv4_address
 }
 
 output "node2_internal_ip" {
-    value = digitalocean_droplet.node02.private_ip
+    value = digitalocean_droplet.node02.ipv4_address_private
 }
 
 output "node3_ip" {
-    value = digitalocean_droplet.node03.ip
+    value = digitalocean_droplet.node03.ipv4_address
 }
 
 output "node3_internal_ip" {
-    value = digitalocean_droplet.node03.private_ip
+    value = digitalocean_droplet.node03.ipv4_address_private
 }
 
 variable "do_token" {}

@@ -18,7 +18,7 @@ provider "digitalocean" {
 }
 
 resource "digitalocean_droplet" "rancher" {
-    name = var.instance_name
+    name = "${var.node_prefix}-${var.instance_name}"
     image = var.instance_image
     region = var.instance_region
     size = var.instance_type
@@ -28,7 +28,7 @@ resource "digitalocean_droplet" "rancher" {
 
 resource "cloudflare_record" "rancherrecord" {
     zone_id = var.zone_id
-    name = var.instance_name
+    name = "${var.instance_name}.${var.rootdomain}"
     type = "A"
     value = digitalocean_droplet.rancher.ipv4_address
     ttl = 60

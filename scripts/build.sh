@@ -135,6 +135,11 @@ variable "ssh_users" {
 variable "rootdomain" {
     default = "$domain_name"
 }
+
+# Node prefix
+variable "node_prefix" {
+    default = "$node_prefix"
+}
 !VARIABLES!OVERRIDE!
 
 if [[ $auto_deploy_downstream == "y" ]]; then

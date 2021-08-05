@@ -44,6 +44,51 @@ while true; do
     sleep 5
 done
 
+function wait_for_nodes() {
+  node1=$(cat terraform.tfstate | jq -r '.outputs.node1_ip')
+  node2=$(cat terraform.tfstate | jq -r '.outputs.node2_ip')
+  node3=$(cat terraform.tfstate | jq -r '.outputs.node3_ip')
+  node1_ready=false
+  node2_ready=false
+  node3_ready=false
+  ssh_cmd="echo 1"
+
+  echo ""
+  echo "Waiting for nodes to be ready..."
+
+  if [[ $downstream_type == "y" ]]; then
+    ssh_cmd="docker container ls"
+  fi
+
+  while true; do
+    if [[ $node1_ready == "false" ]]; then
+      ssh -o "StrictHostKeyChecking=no" -l $ssh_username $node1 $ssh_cmd &>/dev/null
+      if [[ $? -eq 0 ]]; then
+        echo "Node 1 is ready"
+        node1_ready=true
+      fi
+    fi
+    if [[ $node2_ready == "false" ]]; then
+      ssh -o "StrictHostKeyChecking=no" -l $ssh_username $node2 $ssh_cmd &>/dev/null
+      if [[ $? -eq 0 ]]; then
+        echo "Node 2 is ready"
+        node2_ready=true
+      fi
+    fi
+    if [[ $node3_ready == "false" ]]; then
+      ssh -o "StrictHostKeyChecking=no" -l $ssh_username $node3 $ssh_cmd &>/dev/null
+      if [[ $? -eq 0 ]]; then
+        echo "Node 3 is ready"
+        node3_ready=true
+      fi
+    fi
+    if [[ $node1_ready == "true" ]] && [[ $node2_ready == "true" ]] && [[ $node3_ready == "true" ]]; then
+      break
+    fi
+    sleep 5
+  done
+}
+
 if [[ $use_rke == "y" ]]; then
   cd rke
   bash gen-cluster.sh $instance_name $ssh_username $install_rancher
@@ -52,6 +97,9 @@ if [[ $use_rke == "y" ]]; then
     cd downstream
     terraform init
     terraform apply
+
+    wait_for_nodes
+
     if [[ $downstream_type == "rke" ]]; then
       echo "Deploying RKE"
       bash gen-cluster-rke.sh
@@ -61,7 +109,7 @@ if [[ $use_rke == "y" ]]; then
       get_registration_token ${instance_name}.${domain_name} $ranchertoken $clusterid filepath
       echo "Importing cluster"
       KUBECONFIG=downstream/kube_config_cluster.yml kubectl apply -f $filepath
-      "Done"
+      echo "Done"
     fi
   fi
 else

@@ -16,15 +16,15 @@ if [[ ${k8s_version} != "latest" ]]; then
   kubernetes_version=$k8s_version
 fi
 
-node1_name=$(cat terraform.tfstate | jq -r '.outputs.node1_name')
-node1_ip=$(cat terraform.tfstate | jq -r '.outputs.node1_ip')
-node1_internal_ip=$(cat terraform.tfstate | jq -r '.outputs.node1_internal_ip')
-node2_name=$(cat terraform.tfstate | jq -r '.outputs.node2_name')
-node2_ip=$(cat terraform.tfstate | jq -r '.outputs.node2_ip')
-node2_internal_ip=$(cat terraform.tfstate | jq -r '.outputs.node2_internal_ip')
-node3_name=$(cat terraform.tfstate | jq -r '.outputs.node3_name')
-node3_ip=$(cat terraform.tfstate | jq -r '.outputs.node3_ip')
-node3_internal_ip=$(cat terraform.tfstate | jq -r '.outputs.node3_internal_ip')
+node1_name=$(cat terraform.tfstate | jq -r '.outputs.node1_name.value')
+node1_ip=$(cat terraform.tfstate | jq -r '.outputs.node1_ip.value')
+node1_internal_ip=$(cat terraform.tfstate | jq -r '.outputs.node1_internal_ip.value')
+node2_name=$(cat terraform.tfstate | jq -r '.outputs.node2_name.value')
+node2_ip=$(cat terraform.tfstate | jq -r '.outputs.node2_ip.value')
+node2_internal_ip=$(cat terraform.tfstate | jq -r '.outputs.node2_internal_ip.value')
+node3_name=$(cat terraform.tfstate | jq -r '.outputs.node3_name.value')
+node3_ip=$(cat terraform.tfstate | jq -r '.outputs.node3_ip.value')
+node3_internal_ip=$(cat terraform.tfstate | jq -r '.outputs.node3_internal_ip.value')
 
 cat >cluster.yml <<!TEMPLATE!
 nodes:
