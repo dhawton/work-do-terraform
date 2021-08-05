@@ -92,6 +92,7 @@ function wait_for_nodes() {
 if [[ $use_rke == "y" ]]; then
   cd rke
   bash gen-cluster.sh $instance_name $ssh_username $install_rancher
+  cd ..
   set_rancher_admin_password ${instance_name}.${domain_name} ${rancher_admin_password}
   if [[ $auto_deploy_downstream == "y" ]]; then
     cd downstream

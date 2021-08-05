@@ -64,6 +64,6 @@ function get_registration_token() {
         -d '{"clusterId":"'"$cluster_id"'","type":"clusterRegistrationToken"}'
     )
     manifest=$(echo $apiresponse | jq -r '.manifestUrl')
-    curl -ksfL "$manifest"
-    eval $__resultvar=$manifest
+    curl -ksfL "$manifest" -o manifest.yml
+    eval $__resultvar="manifest.yml"
 }
