@@ -1,11 +1,11 @@
 locals {
-    rootdomain = var.rootdomain != "" ? var.rootdomain : "lab.hawton.cloud"
+    rootdomain = var.rootdomain != "" ? var.rootdomain : "do.support.rancher.space"
 }
 
-variable "instance_name" {
+variable "node_prefix" {
     type = string
-    description = "Enter a unique name for the instance"
-    default = "daniel-rancher"
+    description = "Prefix for worker nodes"
+    default = "node"
 }
 
 variable "instance_type" {
@@ -59,11 +59,11 @@ variable "ssh_users" {
 variable "rootdomain" {
     type = string
     description = "Domain to use"
-    default = "lab.hawton.cloud"
+    default = "do.support.rancher.space"
 }
 
-variable "zone_id" {
-    type = string
-    description = "Cloudflare Zone ID"
-    default = "6e22a4dfa8e964495306011198901a37"
+variable "install_docker" {
+    type = bool
+    description = "Should we install docker"
+    default = true
 }

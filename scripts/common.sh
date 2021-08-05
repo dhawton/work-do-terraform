@@ -37,3 +37,33 @@ function do_promptyn() {
     esac
   fi
 }
+
+function do_prompt_choices() {
+  local prompt=$1
+  shift
+  local default=$1
+  shift
+  local __resultvar=$1
+  shift
+  local __choices=("$@")
+
+  read -p "$prompt [$default] " ret
+  local ret=$(echo "$ret" | tr '[:upper:]' '[:lower:]')
+  if [[ $ret == "" ]]; then
+    eval $__resultvar="$default"
+  else
+    haschoice=0
+    for choice in $__choices; do
+      if [[ $ret == $choice ]]; then
+        haschoice=1
+        break
+      fi
+    done
+    if [[ $haschoice == 0 ]]; then
+      echo "Invalid option"
+      do_prompt_choices "$prompt" "$default" $__resultvar $__choices
+    else
+      eval $__resultvar="$ret"
+    fi
+  fi
+}

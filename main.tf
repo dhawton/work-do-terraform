@@ -1,13 +1,20 @@
 terraform {
     required_providers {
+        cloudflare = {
+            source = "cloudflare/cloudflare"
+        }
         digitalocean = {
             source = "digitalocean/digitalocean"
         }
     }
 }
 
+provider "cloudflare"{
+    api_token = var.cloudflare_api_token
+}
+
 provider "digitalocean" {
-  token = var.do_token
+    token = var.do_token
 }
 
 resource "digitalocean_droplet" "rancher" {
@@ -19,8 +26,8 @@ resource "digitalocean_droplet" "rancher" {
     user_data = data.template_cloudinit_config.config.rendered
 }
 
-resource "digitalocean_record" "rancherrecord" {
-    domain = var.rootdomain
+resource "cloudflare_record" "rancherrecord" {
+    zone_id = var.zone_id
     name = var.instance_name
     type = "A"
     value = digitalocean_droplet.rancher.ipv4_address
@@ -28,3 +35,4 @@ resource "digitalocean_record" "rancherrecord" {
 }
 
 variable "do_token" {}
+variable "cloudflare_api_token" {}
