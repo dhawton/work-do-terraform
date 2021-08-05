@@ -45,9 +45,9 @@ while true; do
 done
 
 function wait_for_nodes() {
-  node1=$(cat terraform.tfstate | jq -r '.outputs.node1_ip')
-  node2=$(cat terraform.tfstate | jq -r '.outputs.node2_ip')
-  node3=$(cat terraform.tfstate | jq -r '.outputs.node3_ip')
+  node1=$(cat terraform.tfstate | jq -r '.outputs.node1_ip.value')
+  node2=$(cat terraform.tfstate | jq -r '.outputs.node2_ip.value')
+  node3=$(cat terraform.tfstate | jq -r '.outputs.node3_ip.value')
   node1_ready=false
   node2_ready=false
   node3_ready=false
@@ -94,6 +94,7 @@ if [[ $use_rke == "y" ]]; then
   bash gen-cluster.sh $instance_name $ssh_username $install_rancher
   cd ..
   set_rancher_admin_password ${instance_name}.${domain_name} ${rancher_admin_password}
+  rancher_admin_password=$(cat rancher_admin_password)
   if [[ $auto_deploy_downstream == "y" ]]; then
     cd downstream
     terraform init
@@ -109,10 +110,14 @@ if [[ $use_rke == "y" ]]; then
       create_import_cluster ${instance_name}.${domain_name} $ranchertoken clusterid
       get_registration_token ${instance_name}.${domain_name} $ranchertoken $clusterid filepath
       echo "Importing cluster"
-      KUBECONFIG=downstream/kube_config_cluster.yml kubectl apply -f $filepath
-      echo "Done"
+      KUBECONFIG=kube_config_cluster.yml kubectl apply -f $filepath
+      echo "Done, will take a few minutes to spin up appropriate agents"
     fi
   fi
+
+  echo ""
+  echo "Rancher is ready at ${instance_name}.${domain_name}"
+  echo "Admin password $rancher_admin_password"
 else
   echo "Not configured to use RKE... so we're done here."
   echo "Server is up at ${instance_name}.${domain_name}"

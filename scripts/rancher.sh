@@ -11,6 +11,8 @@ function set_rancher_admin_password() {
         echo "--- Using admin password: $admin_password"
     fi
 
+    echo $admin_password > rancher_admin_password
+
     login_token=$(curl -ks "https://$rancher_api/v3-public/localProviders/local?action=login" -H "Content-Type: application/json" -d '{"username":"admin", "password":"'"$defaultPass"'"}' | jq -r '.token')
     if [[ -z "$login_token" ]]; then
         echo "Error: Failed to login to Rancher"
@@ -24,7 +26,7 @@ function set_rancher_admin_password() {
 function get_rancher_token() {
     rancher_api=$1
     admin_password=$2
-    local __resultvar=$2
+    local __resultvar=$3
     login_token=$(curl -ks "https://$rancher_api/v3-public/localProviders/local?action=login" -X POST -H "Content-Type: application/json" -d '{"username":"admin", "password":"'"$admin_password"'"}' | jq -r '.token')
     if [[ -z "$login_token" ]]; then
         echo "Error: Failed to login to Rancher"
@@ -43,12 +45,13 @@ function create_import_cluster() {
     local __resultvar=$3
 
     apiresponse=$(curl -ks "https://$rancher_api/v3/cluster" \
-        -X PUT \
+        -X POST \
         -H "Authorization: Bearer $rancher_token" \
         -H "Content-Type: application/json" \
         -d '{"dockerRootDir":"/var/lib/docker","enableClusterAlerting":false,"enableClusterMonitoring":false,"enableNetworkPolicy":false,"windowsPreferedCluster":false,"type":"cluster","name":"imported","agentEnvVars":[],"labels":{},"annotations":{}}')
 
-    eval $__resultvar=$(echo $apiresponse | jq -r '.id')
+    cluster_id=$(echo $apiresponse | jq -r '.id')
+    eval $__resultvar="$cluster_id"
 }
 
 function get_registration_token() {
