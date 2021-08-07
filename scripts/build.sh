@@ -74,6 +74,7 @@ if [[ $cloudflare_token == "" ]]; then
   fi
 fi
 
+do_prompt "Node prefix" $default_node_prefix node_prefix
 do_prompt "Instance Name" $default_instance_name instance_name
 do_prompt "Domain" $default_domain_name domain_name
 do_prompt "Instance Type" $default_instance_type instance_type
@@ -92,11 +93,24 @@ fi
 do_prompt "SSH Username" $default_ssh_username ssh_username
 do_prompt "SSH Key" $default_ssh_key ssh_key
 do_prompt "GitHub Username for SSH public keys" $default_github_username github_username
-do_prompt "Rancher Admin password, blank for random" "$default_rancher_admin_password" rancher_admin_password
-do_promptyn "Auto-deploy downstream cluster?" $default_auto_deploy_downstream auto_deploy_downstream
-if [[ $auto_deploy_downstream == "y" ]]; then
-  do_prompt_choices "Downstream type (rke, k3s, rke2)" $default_downstream_type downstream_type rke rke2 k3s
-  do_prompt "Node prefix" $default_node_prefix node_prefix
+if [[ $install_rancher == "y" ]]; then
+  do_prompt "Rancher Admin password, blank for random" "$default_rancher_admin_password" rancher_admin_password
+  do_promptyn "Auto-deploy downstream cluster?" $default_auto_deploy_downstream auto_deploy_downstream
+  if [[ $auto_deploy_downstream == "y" ]]; then
+    do_prompt_choices "Downstream type (rke, k3s, rke2)" $default_downstream_type downstream_type rke rke2 k3s
+    if [[ $downstream_type == "rke" ]]; then
+      do_prompt "Downstream Cluster Version" "latest" downstream_kubernetes_version
+    elif [[ $downstream_type == "k3s" ]]; then
+      while true; do
+        do_prompt "k3s Channel" "" downstream_kubernetes_version
+        if [[ $downstream_kubernetes_version == "" ]]; then
+          echo "k3s channel cannot be blank"
+        else
+          break
+        fi
+      done
+    fi
+  fi
 fi
 
 cat >variables_override.tf <<!VARIABLES!OVERRIDE!
@@ -211,6 +225,7 @@ rancher_version=$rancher_version
 rancher_admin_password=$rancher_admin_password
 auto_deploy_downstream=$auto_deploy_downstream
 downstream_type=$downstream_type
+downstream_kubernetes_version=$downstream_kubernetes_version
 !VARIABLES!OVERRIDE!
 
 do_promptyn "Do you wish to deploy now?" "n" do_deploy

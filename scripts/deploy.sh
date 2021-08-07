@@ -113,8 +113,18 @@ if [[ $use_rke == "y" ]]; then
       KUBECONFIG=kube_config_cluster.yml kubectl apply -f $filepath
       echo "Done, will take a few minutes to spin up appropriate agents"
     fi
+    if [[ $downstream_type == "k3s" ]]; then
+      echo "Deploying K3S"
+      bash gen-cluster-k3s.sh
+      get_rancher_token ${instance_name}.${domain_name} ${rancher_admin_password} ranchertoken
+      echo "Creating cluster in Rancher"
+      create_import_cluster ${instance_name}.${domain_name} $ranchertoken clusterid
+      get_registration_token ${instance_name}.${domain_name} $ranchertoken $clusterid filepath
+      echo "Importing cluster"
+      scp -o "StrictHostKeyChecking=no" $filepath $ssh_username@$node1:/tmp/manifest.yml
+      ssh -o "StrictHostKeyChecking=no" -l $ssh_username $node1 k3s kubectl apply -f /tmp/manifest.yml && rm /tmp/manifest.yml
+    fi
   fi
-
   echo ""
   echo "Rancher is ready at ${instance_name}.${domain_name}"
   echo "Admin password $rancher_admin_password"

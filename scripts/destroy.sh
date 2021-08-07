@@ -2,10 +2,12 @@
 
 . buildconfig.sh
 
-if [[ $use_rke == "y" ]]; then
-  cd rke
-  rke remove
-  cd ..
+if [[ $auto_deploy_downstream == "y" ]]; then
+    echo "Destroying downstream"
+    cd downstream
+    terraform destroy
+    cd ..
 fi
 
+echo "Destroying upstream"
 terraform destroy
