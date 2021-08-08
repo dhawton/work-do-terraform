@@ -109,6 +109,15 @@ if [[ $install_rancher == "y" ]]; then
           break
         fi
       done
+    elif [[ $downstream_type == "rke2" ]]; then
+      while true; do
+        do_prompt "RKE2 Channel" "" downstream_kubernetes_version
+        if [[ $downstream_kubernetes_version == "" ]]; then
+          echo "RKE2 channel cannot be blank"
+        else
+          break
+        fi
+      done
     fi
   fi
 fi
