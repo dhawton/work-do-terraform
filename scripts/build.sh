@@ -86,6 +86,9 @@ if [[ $use_rke == "y" ]]; then
   do_promptyn "Install Rancher" $default_install_rancher install_rancher
   if [[ $install_rancher == "y" ]]; then
     do_prompt "Rancher Version" $default_rancher_version rancher_version
+    do_prompt "Path to cert" $default_rancher_cert rancher_cert
+    do_prompt "Path to key" $default_rancher_key rancher_key
+    do_prompt "Path to ca cert if needed" $default_rancher_ca rancher_ca
   fi
 else
   install_rancher="n"
@@ -235,6 +238,9 @@ rancher_admin_password=$rancher_admin_password
 auto_deploy_downstream=$auto_deploy_downstream
 downstream_type=$downstream_type
 downstream_kubernetes_version=$downstream_kubernetes_version
+rancher_cert=$rancher_cert
+rancher_key=$rancher_key
+rancher_ca=$rancher_ca
 !VARIABLES!OVERRIDE!
 
 do_promptyn "Do you wish to deploy now?" "n" do_deploy

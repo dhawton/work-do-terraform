@@ -74,27 +74,35 @@ fi
 log "Adding rancher chart, likely to already exist..."
 hlm repo add rancher-latest https://releases.rancher.com/server-charts/latest
 
-log "Updating helm repo"
-hlm repo update
+# log "Updating helm repo"
+# hlm repo update
 
-log "Adding jetstack helm repo and updating repos"
-hlm repo add jetstack https://charts.jetstack.io
-hlm repo update
+# log "Adding jetstack helm repo and updating repos"
+# hlm repo add jetstack https://charts.jetstack.io
+# hlm repo update
 
-log "Installing cert-manager..."
-kc create namespace cert-manager
-kc apply -f https://github.com/jetstack/cert-manager/releases/download/v1.4.0/cert-manager.yaml
-hlm install cert-manager jetstack/cert-manager \
-  --namespace cert-manager \
-  --version v1.4.0
+# log "Installing cert-manager..."
+# kc create namespace cert-manager
+# kc apply -f https://github.com/jetstack/cert-manager/releases/download/v1.4.0/cert-manager.yaml
+# hlm install cert-manager jetstack/cert-manager \
+#   --namespace cert-manager \
+#   --version v1.4.0
 
-log "Waiting for deployment..."
-kc -n cert-manager rollout status deploy/cert-manager
-kc -n cert-manager rollout status deploy/cert-manager-webhook
-kc -n cert-manager rollout status deploy/cert-manager-cainjector
+# log "Waiting for deployment..."
+# kc -n cert-manager rollout status deploy/cert-manager
+# kc -n cert-manager rollout status deploy/cert-manager-webhook
+# kc -n cert-manager rollout status deploy/cert-manager-cainjector
 
-log "Giving cert-manager more time to finish deploying"
-sleep 30
+# log "Giving cert-manager more time to finish deploying"
+# sleep 30
+
+log "Creating secret"
+kc -n cattle-system create secret tls tls-rancher-ingress --cert=$rancher_cert --key=$rancher_key
+
+if [[ ! -z "$rancher_ca" ]]; then
+  log "Creating CA secret"
+  kc -n cattle-system create secret generic tls-ca --from-file=cacerts.pem=${rancher_ca}
+fi
 
 log "Creating cattle-system namespace"
 kc create namespace cattle-system
@@ -104,13 +112,16 @@ if [[ $rancher_version != "latest" ]]; then
   rancher_arg="--version ${rancer_version}"
 fi
 
+if [[ $rancher_ca != "" ]]; then
+  rancher_arg="--set privateCA=true ${rancher_arg}"
+fi
+
 log "Installing Rancher from charts"
 hlm install rancher rancher-latest/rancher \
   --namespace cattle-system \
   --set hostname=${instance_name}.${domain_name} \
   --set replicas=1 \
-  --set ingress.tls.source=letsEncrypt \
-  --set letsEncrypt.email=daniel.hawton@suse.com \
+  --set ingress.tls.source=secret \
   $ranger_arg
 
 log "Waiting for Rancher deployment"

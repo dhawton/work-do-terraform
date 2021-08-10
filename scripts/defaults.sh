@@ -14,3 +14,6 @@ default_rancher_admin_password=
 default_auto_deploy_downstream="y"
 default_downstream_type="rke"
 default_node_prefix="daniel"
+default_rancher_cert="$HOME/work/certs/cert.pem"
+default_rancher_key="$HOME/work/certs/privkey.pem"
+default_rancher_ca="$HOME/work/certs/chain.pem"
