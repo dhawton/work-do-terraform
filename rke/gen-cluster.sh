@@ -7,7 +7,7 @@ if [[ "$3" == "" ]]; then
   exit 1
 fi
 
-ipv4=$(dig +short ${instance_name}.${domain_name})
+ipv4=$(cat ../terraform.tfstate | jq -r '.outputs.rancher_ip.value')
 
 ssh-keygen -f "$HOME/.ssh/known_hosts" -R "${instance_name}.${domain_name}" &>/dev/null
 ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$ipv4" &>/dev/null

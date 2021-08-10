@@ -34,5 +34,9 @@ resource "cloudflare_record" "rancherrecord" {
     ttl = 60
 }
 
+output "rancher_ip" {
+    value = digitalocean_droplet.rancher.ipv4_address
+}
+
 variable "do_token" {}
 variable "cloudflare_api_token" {}
