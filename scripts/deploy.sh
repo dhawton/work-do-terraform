@@ -105,6 +105,7 @@ if [[ $use_rke == "y" ]]; then
     if [[ $downstream_type == "rke" ]]; then
       echo "Deploying RKE"
       bash gen-cluster-rke.sh
+      sleep 10 # docker container ls seems to return 0, but then rke fails to reach the sock.. so let's give extra time.
       get_rancher_token ${instance_name}.${domain_name} ${rancher_admin_password} ranchertoken
       echo "Creating cluster in Rancher"
       create_import_cluster ${instance_name}.${domain_name} $ranchertoken clusterid
