@@ -15,8 +15,6 @@ function log() {
   echo "$@"
 }
 
-chmod 600 kube_config_cluster.yml
-
 log "Adding rancher chart, likely to already exist..."
 hlm repo add rancher-latest https://releases.rancher.com/server-charts/latest
 

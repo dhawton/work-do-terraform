@@ -15,18 +15,19 @@ fi
 k3s_token=$(date +%s | sha256sum | base64 | head -c 16 ; echo)
 
 function do_ssh() {
-  ssh -vv -o "StrictHostKeyChecking=no" -l $ssh_username $ipv4 $@
+  ssh -o "StrictHostKeyChecking=no" -l $ssh_username $ipv4 "$@"
 }
 
 echo "Installing k3s"
-do_ssh curl -sfL "https://get.k3s.io -o /tmp/install.sh && INSTALL_K3S_CHANNEL=${downstream_kubernetes_version} K3S_TOKEN=${k3s_token} sh /tmp/install.sh --cluster-init"
+do_ssh "curl -sfL https://get.k3s.io -o /tmp/install.sh && INSTALL_K3S_CHANNEL=${kubernetes_version} K3S_TOKEN=${k3s_token} sh /tmp/install.sh --cluster-init"
 echo "Getting kubeconfig"
-kubeconfig=$(do_ssh sudo cat /etc/rancher/k3s/k3s.yaml | sed 's/127.0.0.1/$ipv4/')
+do_ssh "sudo cat /etc/rancher/k3s/k3s.yaml | sed \"s/127.0.0.1/$ipv4/\"" > kubeconfig.yml
 if [[ $? -ne 0 ]]; then
   echo "Failed to get kubeconfig"
   exit 1
 fi
-echo $kubeconfig > kubeconfig.yml
+
+chmod 600 kubeconfig.yml
 
 echo "Saved to kubeconfig.yml"
 
