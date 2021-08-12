@@ -37,7 +37,7 @@ while true; do
         echo "SSH appears ready to move on"
         break
     fi
-    sleep 5
+    #sleep 5
 done
 
 function wait_for_nodes() {

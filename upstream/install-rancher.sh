@@ -44,7 +44,7 @@ hlm install rancher rancher-latest/rancher \
   --set hostname=${instance_name}.${domain_name} \
   --set replicas=1 \
   --set ingress.tls.source=secret \
-  $ranger_arg
+  $rancher_arg
 
 log "Waiting for Rancher deployment"
 kc -n cattle-system rollout status deploy/rancher

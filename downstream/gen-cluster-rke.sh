@@ -5,7 +5,7 @@
 
 kubernetes_version=""
 if [[ ${downstream_kubernetes_version} != "latest" ]]; then
-  kubernetes_version=$k8s_version
+  kubernetes_version=$downstream_kubernetes_version
 fi
 
 cat >cluster.yml <<!TEMPLATE!
