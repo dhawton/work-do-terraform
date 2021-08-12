@@ -80,15 +80,15 @@ do_prompt "Domain" $default_domain_name domain_name
 do_prompt "Instance Type" $default_instance_type instance_type
 do_prompt "Instance Image" $default_instance_image instance_image
 do_prompt "Instance Region" $default_instance_region instance_region
-do_promptyn "Use RKE?" $default_use_rke use_rke
-if [[ $use_rke == "y" ]]; then
-  do_prompt "Kubernetes Version" $default_k8s_version k8s_version
+do_promptyn "Build upstream?" $default_build_upstream build_upstream
+if [[ $build_upstream == "y" ]]; then
+  do_prompt "K3s Channel" $default_k8s_version k8s_version
   do_promptyn "Install Rancher" $default_install_rancher install_rancher
   if [[ $install_rancher == "y" ]]; then
     do_prompt "Rancher Version" $default_rancher_version rancher_version
     do_prompt "Path to cert" $default_rancher_cert rancher_cert
     do_prompt "Path to key" $default_rancher_key rancher_key
-    do_prompt "Path to ca cert if needed" $default_rancher_ca rancher_ca
+    do_prompt "Path to ca cert" $default_rancher_ca rancher_ca
   fi
 else
   install_rancher="n"

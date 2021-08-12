@@ -29,10 +29,6 @@ fi
 echo "Waiting for cloud-init to complete..."
 ssh_cmd="echo 1"
 
-if [[ $use_rke == "y" ]]; then
-  ssh_cmd="docker container ls"
-fi
-
 sleep 10
 
 while true; do
@@ -90,8 +86,8 @@ function wait_for_nodes() {
 }
 
 if [[ $use_rke == "y" ]]; then
-  cd rke
-  bash gen-cluster.sh $instance_name $ssh_username $install_rancher
+  cd upstream
+  bash gen-cluster.sh
   cd ..
   set_rancher_admin_password ${instance_name}.${domain_name} ${rancher_admin_password}
   rancher_admin_password=$(cat rancher_admin_password)

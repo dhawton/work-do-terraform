@@ -18,7 +18,7 @@ data "template_cloudinit_config" "config" {
         content = templatefile("${path.module}/cloudinit/02-configure.sh.tpl", {
             hostname = "${var.instance_name}.${var.rootdomain}",
             ssh_users = var.ssh_users
-            install_docker = true
+            install_docker = false
         })
     }
 }

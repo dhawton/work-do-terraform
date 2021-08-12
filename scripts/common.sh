@@ -47,13 +47,15 @@ function do_prompt_choices() {
   shift
   local __choices=("$@")
 
+  echo ${__choices[@]}
+
   read -p "$prompt [$default] " ret
   local ret=$(echo "$ret" | tr '[:upper:]' '[:lower:]')
   if [[ $ret == "" ]]; then
     eval $__resultvar="$default"
   else
     haschoice=0
-    for choice in $__choices; do
+    for choice in "${__choices[@]}"; do
       if [[ $ret == $choice ]]; then
         haschoice=1
         break

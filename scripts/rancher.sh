@@ -13,9 +13,11 @@ function set_rancher_admin_password() {
 
     echo $admin_password > rancher_admin_password
 
-    login_token=$(curl -ks "https://$rancher_api/v3-public/localProviders/local?action=login" -H "Content-Type: application/json" -d '{"username":"admin", "password":"'"$defaultPass"'"}' | jq -r '.token')
+    login_response=$(curl -ks "https://$rancher_api/v3-public/localProviders/local?action=login" -H "Content-Type: application/json" -d '{"username":"admin", "password":"'"$defaultPass"'"}')
+    login_token=$(echo $login_response | jq -r '.token')
     if [[ -z "$login_token" ]]; then
         echo "Error: Failed to login to Rancher"
+        echo "Debug: $login_response"
         exit 1
     fi
 
