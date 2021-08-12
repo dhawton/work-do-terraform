@@ -31,7 +31,7 @@ fi
 
 rancher_arg=""
 if [[ $rancher_version != "latest" ]]; then
-  rancher_arg="--version ${rancer_version}"
+  rancher_arg="--version ${rancher_version}"
 fi
 
 if [[ ! -z "$rancher_ca" ]]; then
