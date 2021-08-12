@@ -22,7 +22,7 @@ function do_install() {
         sudo echo \"token: $rke2_token\" >> /etc/rancher/rke2/config.yaml"
     fi
     echo "Installing RKE2..."
-    ssh -o "StrictHostKeyChecking=no" -l $ssh_username $ip curl -sfL https://get.rke2.io -o /tmp/install.sh; INSTALL_RKE2_CHANNEL=${downstream_kubernetes_version} sh /tmp/install.s
+    ssh -o "StrictHostKeyChecking=no" -l $ssh_username $ip "curl -sfL https://get.rke2.io -o /tmp/install.sh; INSTALL_RKE2_CHANNEL=${downstream_kubernetes_version} sh /tmp/install.sh"
     echo "Enabling and starting service..."
     ssh -o "StrictHostKeyChecking=no" -l $ssh_username $ip "sudo systemctl enable rke2-server.service && sudo systemctl start rke2-server.service"
     echo "Giving time to spin up..."

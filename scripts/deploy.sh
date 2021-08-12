@@ -85,7 +85,7 @@ function wait_for_nodes() {
   done
 }
 
-if [[ $use_rke == "y" ]]; then
+if [[ $build_upstream == "y" ]]; then
   cd upstream
   bash gen-cluster.sh
   cd ..
@@ -135,6 +135,6 @@ if [[ $use_rke == "y" ]]; then
   echo "Rancher is ready at ${instance_name}.${domain_name}"
   echo "Admin password $rancher_admin_password"
 else
-  echo "Not configured to use RKE... so we're done here."
+  echo "Not configured to autodeploy upstream... so we're done here."
   echo "Server is up at ${instance_name}.${domain_name}"
 fi
