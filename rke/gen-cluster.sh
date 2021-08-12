@@ -96,6 +96,9 @@ hlm repo add rancher-latest https://releases.rancher.com/server-charts/latest
 # log "Giving cert-manager more time to finish deploying"
 # sleep 30
 
+log "Creating cattle-system namespace"
+kc create namespace cattle-system
+
 log "Creating secret"
 kc -n cattle-system create secret tls tls-rancher-ingress --cert=$rancher_cert --key=$rancher_key
 
@@ -103,9 +106,6 @@ if [[ ! -z "$rancher_ca" ]]; then
   log "Creating CA secret"
   kc -n cattle-system create secret generic tls-ca --from-file=cacerts.pem=${rancher_ca}
 fi
-
-log "Creating cattle-system namespace"
-kc create namespace cattle-system
 
 rancher_arg=""
 if [[ $rancher_version != "latest" ]]; then
