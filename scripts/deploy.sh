@@ -18,27 +18,63 @@ if [[ $auto_deploy_downstream == "y" ]]; then
   fi
 fi
 
-terraform init
-terraform apply
+function deploy_upstream() {
+  echo "Deploying upstream"
+  terraform init
+  terraform apply
 
-if [[ $? -ne "0" ]]; then
-  echo "Terraform doesn't appear to have exited cleanly"
-  exit 1
-fi
+  if [[ $? -ne "0" ]]; then
+    echo "Terraform apply failed"
+    exit 1
+  fi
 
-echo "Waiting for cloud-init to complete..."
-ssh_cmd="echo 1"
+  echo ""
+  echo "Waiting for cloud-init to complete..."
+  ssh_cmd="echo 1"
 
-sleep 10
+  sleep 10
 
-while true; do
-    ssh -o "StrictHostKeyChecking=no" -l $ssh_username ${instance_name}.${domain_name} $ssh_cmd &>/dev/null
-    if [[ $? -eq 0 ]]; then
-        echo "SSH appears ready to move on"
-        break
+  while true; do
+      ssh -o "StrictHostKeyChecking=no" -l $ssh_username ${instance_name}.${domain_name} $ssh_cmd &>/dev/null
+      if [[ $? -eq 0 ]]; then
+          echo "SSH appears ready to move on"
+          break
+      fi
+      #sleep 5
+  done
+
+  if [[ $build_upstream == "y" ]]; then
+    install_rancher
+    if [[ $auto_deploy_downstream == "y" ]]; then
+      deploy_downstream
     fi
-    #sleep 5
-done
+  else
+    echo ""
+    echo "We seem to be done here."
+  fi
+}
+
+function install_rancher() {
+  echo ""
+  echo "Building upstream cluster"
+  cd upstream
+  bash gen_cluster.sh
+  cd ..
+
+  echo ""
+  echo "Setting Rancher Password"
+  set_rancher_admin_password ${instance_name}.${domain_name} ${rancher_admin_password}
+  get_password
+
+  echo ""
+  echo "Rancher install completed."
+}
+
+function get_password() {
+  if [[ -f "rancher_admin_password" ]]; then
+    rancher_admin_password=$(cat rancher_admin_password)
+  fi
+}
 
 function wait_for_nodes() {
   node1=$(cat terraform.tfstate | jq -r '.outputs.node1_ip.value')
@@ -52,7 +88,7 @@ function wait_for_nodes() {
   echo ""
   echo "Waiting for nodes to be ready..."
 
-  if [[ $downstream_type == "y" ]]; then
+  if [[ $downstream_type == "rke" ]]; then
     ssh_cmd="docker container ls"
   fi
 
@@ -85,56 +121,74 @@ function wait_for_nodes() {
   done
 }
 
-if [[ $build_upstream == "y" ]]; then
-  cd upstream
-  bash gen-cluster.sh
-  cd ..
-  set_rancher_admin_password ${instance_name}.${domain_name} ${rancher_admin_password}
-  rancher_admin_password=$(cat rancher_admin_password)
-  if [[ $auto_deploy_downstream == "y" ]]; then
-    cd downstream
-    terraform init
-    terraform apply
-
-    wait_for_nodes
-
-    if [[ $downstream_type == "rke" ]]; then
-      echo "Deploying RKE"
-      bash gen-cluster-rke.sh
-      sleep 10 # docker container ls seems to return 0, but then rke fails to reach the sock.. so let's give extra time.
-      get_rancher_token ${instance_name}.${domain_name} ${rancher_admin_password} ranchertoken
-      echo "Creating cluster in Rancher"
-      create_import_cluster ${instance_name}.${domain_name} $ranchertoken clusterid
-      get_registration_token ${instance_name}.${domain_name} $ranchertoken $clusterid filepath
-      echo "Importing cluster"
-      KUBECONFIG=kube_config_cluster.yml kubectl apply -f $filepath
-      echo "Done, will take a few minutes to spin up appropriate agents"
-    elif [[ $downstream_type == "k3s" ]]; then
-      echo "Deploying K3S"
-      bash gen-cluster-k3s.sh
-      get_rancher_token ${instance_name}.${domain_name} ${rancher_admin_password} ranchertoken
-      echo "Creating cluster in Rancher"
-      create_import_cluster ${instance_name}.${domain_name} $ranchertoken clusterid
-      get_registration_token ${instance_name}.${domain_name} $ranchertoken $clusterid filepath
-      echo "Importing cluster"
-      scp -o "StrictHostKeyChecking=no" $filepath $ssh_username@$node1:/tmp/manifest.yml
-      ssh -o "StrictHostKeyChecking=no" -l $ssh_username $node1 k3s kubectl apply -f /tmp/manifest.yml && rm /tmp/manifest.yml
-    elif [[ $downstream_type == "rke2" ]]; then
-      echo "Deploying RKE2"
-      bash gen-cluster-rke2.sh
-      get_rancher_token ${instance_name}.${domain_name} ${rancher_admin_password} ranchertoken
-      echo "Creating cluster in Rancher"
-      create_import_cluster ${instance_name}.${domain_name} $ranchertoken clusterid
-      get_registration_token ${instance_name}.${domain_name} $ranchertoken $clusterid filepath
-      echo "Importing cluster"
-      scp -o "StrictHostKeyChecking=no" $filepath $ssh_username@$node1:/tmp/manifest.yml
-      ssh -o "StrictHostKeyChecking=no" -l $ssh_username $node1 /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml apply -f /tmp/manifest.yml
-    fi
-  fi
+function deploy_downstream() {
   echo ""
-  echo "Rancher is ready at ${instance_name}.${domain_name}"
-  echo "Admin password $rancher_admin_password"
-else
-  echo "Not configured to autodeploy upstream... so we're done here."
-  echo "Server is up at ${instance_name}.${domain_name}"
+  echo "Deploying Downstream Cluster"
+  cd downstream
+  terraform init
+  terraform apply
+
+  wait_for_nodes
+  cd ..
+  install_downstream
+}
+
+function install_downstream() {
+  echo ""
+  echo "Installing downstream"
+  cd downstream
+  if [[ $downstream_type == "rke" ]]; then
+    echo "Deploying RKE"
+    bash gen-cluster-rke.sh
+    get_rancher_token ${instance_name}.${domain_name} ${rancher_admin_password} ranchertoken
+    echo "Creating cluster in Rancher"
+    create_import_cluster ${instance_name}.${domain_name} $ranchertoken clusterid
+    get_registration_token ${instance_name}.${domain_name} $ranchertoken $clusterid filepath
+    echo "Importing cluster"
+    KUBECONFIG=kube_config_cluster.yml kubectl apply -f $filepath
+    echo "Done, will take a few minutes to spin up appropriate agents"
+  elif [[ $downstream_type == "k3s" ]]; then
+    echo "Deploying K3S"
+    bash gen-cluster-k3s.sh
+    get_rancher_token ${instance_name}.${domain_name} ${rancher_admin_password} ranchertoken
+    echo "Creating cluster in Rancher"
+    create_import_cluster ${instance_name}.${domain_name} $ranchertoken clusterid
+    get_registration_token ${instance_name}.${domain_name} $ranchertoken $clusterid filepath
+    echo "Importing cluster"
+    scp -o "StrictHostKeyChecking=no" $filepath $ssh_username@$node1:/tmp/manifest.yml
+    ssh -o "StrictHostKeyChecking=no" -l $ssh_username $node1 k3s kubectl apply -f /tmp/manifest.yml && rm /tmp/manifest.yml
+  elif [[ $downstream_type == "rke2" ]]; then
+    echo "Deploying RKE2"
+    bash gen-cluster-rke2.sh
+    get_rancher_token ${instance_name}.${domain_name} ${rancher_admin_password} ranchertoken
+    echo "Creating cluster in Rancher"
+    create_import_cluster ${instance_name}.${domain_name} $ranchertoken clusterid
+    get_registration_token ${instance_name}.${domain_name} $ranchertoken $clusterid filepath
+    echo "Importing cluster"
+    scp -o "StrictHostKeyChecking=no" $filepath $ssh_username@$node1:/tmp/manifest.yml
+    ssh -o "StrictHostKeyChecking=no" -l $ssh_username $node1 /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml apply -f /tmp/manifest.yml
+  fi
+}
+
+function post_wrap() {
+  if [[ $build_upstream == "y" ]]; then
+    echo ""
+    echo "Rancher is ready at ${instance_name}.${domain_name}"
+    echo "Admin password $rancher_admin_password"
+  else
+    echo ""
+    echo "We are done."
+  fi
+}
+
+if [[ $rancher_admin_password == "" ]]; then
+  get_password
 fi
+
+if [[ -z "${*}" ]]; then
+  deploy_upstream
+else
+  "${*}"
+fi
+
+post_wrap
