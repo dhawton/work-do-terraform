@@ -32,7 +32,7 @@ function deploy_upstream() {
   echo "Waiting for cloud-init to complete..."
   ssh_cmd="echo 1"
 
-  sleep 10
+  #sleep 10
 
   while true; do
       ssh -o "StrictHostKeyChecking=no" -l $ssh_username ${instance_name}.${domain_name} $ssh_cmd &>/dev/null
@@ -58,7 +58,7 @@ function install_rancher() {
   echo ""
   echo "Building upstream cluster"
   cd upstream
-  bash gen_cluster.sh
+  bash gen-cluster.sh
   cd ..
 
   echo ""
