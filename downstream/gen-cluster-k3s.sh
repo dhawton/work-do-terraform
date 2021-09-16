@@ -11,12 +11,12 @@ function do_install() {
     local cmdargs=""
     echo ""
     echo "Installing on $3"
-    if [[ $first_node ]]; then
+    if [[ $first_node == "true" ]]; then
       cmdargs="--cluster-init"
     else
       cmdargs="--server https://${node1_ip}:6443"
     fi
-    ssh -o "StrictHostKeyChecking=no" -l $ssh_username $ip "curl -sfL https://get.k3s.io -o /tmp/install.sh; INSTALL_K3S_CHANNEL=${downstream_kubernetes_version} K3S_TOKEN=${k3s_token} sh /tmp/install.sh $cmdargs"
+    ssh -o "StrictHostKeyChecking=no" -l $ssh_username $ip "curl -sfL https://get.k3s.io -o /tmp/install.sh; sudo INSTALL_K3S_CHANNEL=${downstream_kubernetes_version} K3S_TOKEN=${k3s_token} sh /tmp/install.sh $cmdargs"
     echo "Done"
 }
 

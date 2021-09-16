@@ -2,12 +2,16 @@
 
 defaultPass="admin"
 
+function generate_password() {
+    date +%s | sha256sum | base64 | head -c 32 ; echo
+}
+
 function set_rancher_admin_password() {
     rancher_api=$1
     admin_password=$2
     if [[ -z "$admin_password" ]]; then
         echo "Warning: admin password not provided"
-        admin_password=$(date +%s | sha256sum | base64 | head -c 16 ; echo)
+        admin_password=$(generate_password)
         echo "--- Using admin password: $admin_password"
     fi
 

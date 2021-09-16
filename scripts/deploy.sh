@@ -166,7 +166,7 @@ function install_downstream() {
     get_registration_token ${instance_name}.${domain_name} $ranchertoken $clusterid filepath
     echo "Importing cluster"
     scp -o "StrictHostKeyChecking=no" $filepath $ssh_username@$node1:/tmp/manifest.yml
-    ssh -o "StrictHostKeyChecking=no" -l $ssh_username $node1 /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml apply -f /tmp/manifest.yml
+    ssh -o "StrictHostKeyChecking=no" -l $ssh_username $node1 sudo /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml apply -f /tmp/manifest.yml
   fi
 }
 
