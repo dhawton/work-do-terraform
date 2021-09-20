@@ -67,3 +67,9 @@ variable "install_docker" {
     description = "Should we install docker"
     default = true
 }
+
+variable "do_tag" {
+    type = string
+    description = "Tag to use for DO"
+    default = ""
+}

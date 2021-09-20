@@ -17,6 +17,7 @@ resource "digitalocean_droplet" "node01" {
     size = var.instance_type
     private_networking = true
     user_data = data.template_cloudinit_config.config.rendered
+    tags = [var.do_tag]
 }
 
 resource "digitalocean_droplet" "node02" {
@@ -26,6 +27,7 @@ resource "digitalocean_droplet" "node02" {
     size = var.instance_type
     private_networking = true
     user_data = data.template_cloudinit_config.config.rendered
+    tags = [var.do_tag]
 }
 
 resource "digitalocean_droplet" "node03" {
@@ -35,6 +37,7 @@ resource "digitalocean_droplet" "node03" {
     size = var.instance_type
     private_networking = true
     user_data = data.template_cloudinit_config.config.rendered
+    tags = [var.do_tag]
 }
 
 output "node1_name" {

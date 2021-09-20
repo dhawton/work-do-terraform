@@ -74,6 +74,7 @@ if [[ $cloudflare_token == "" ]]; then
   fi
 fi
 
+do_prompt "Digital Ocean tag name" $default_do_tag do_tag
 do_prompt "Node prefix" $default_node_prefix node_prefix
 do_prompt "Instance Name" $default_instance_name instance_name
 do_prompt "Domain" $default_domain_name domain_name
@@ -166,6 +167,10 @@ variable "rootdomain" {
 variable "node_prefix" {
     default = "$node_prefix"
 }
+
+variable "do_tag" {
+    default = "$do_tag"
+}
 !VARIABLES!OVERRIDE!
 
 if [[ $auto_deploy_downstream == "y" ]]; then
@@ -204,6 +209,10 @@ variable "ssh_users" {
 
 variable "rootdomain" {
     default = "$domain_name"
+}
+
+variable "do_tag" {
+    default = "$do_tag"
 }
 !VARIABLES!OVERRIDE!
 

@@ -73,3 +73,9 @@ variable "node_prefix" {
     description = "Prefix for node names"
     default = ""
 }
+
+variable "do_tag" {
+    type = string
+    description = "Tag to use for DO"
+    default = ""
+}

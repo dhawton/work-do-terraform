@@ -24,6 +24,7 @@ resource "digitalocean_droplet" "rancher" {
     size = var.instance_type
     private_networking = true
     user_data = data.template_cloudinit_config.config.rendered
+    tags = [var.do_tag]
 }
 
 resource "cloudflare_record" "rancherrecord" {
