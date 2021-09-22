@@ -83,3 +83,5 @@ output "node3_internal_ip" {
 }
 
 variable "do_token" {}
+
+variable "cloudflare_api_token" {}

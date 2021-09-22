@@ -18,12 +18,12 @@ function do_install() {
     if [[ $first_node == "true" ]]; then
       echo "Creating config.yaml"
       ssh -o "StrictHostKeyChecking=no" -l $ssh_username $ip "sudo mkdir -p /etc/rancher/rke2 && \
-        sudo sh -c 'echo \"token: $rke2_token\" > /etc/rancher/rke2/config.yaml'"
+        sudo sh -c 'printf \"token: $rke2_token\ntls-san:\n  - ${lb_hostname}\" > /etc/rancher/rke2/config.yaml'"
     else
       echo "Creating config.yaml"
       ssh -o "StrictHostKeyChecking=no" -l $ssh_username $ip "sudo mkdir -p /etc/rancher/rke2 && \
-        sudo sh -c 'echo \"server: https://${node1_ip}:9345\" > /etc/rancher/rke2/config.yaml' && \
-        sudo sh -c 'echo \"token: $rke2_token\" >> /etc/rancher/rke2/config.yaml'"
+        sudo sh -c 'echo \"server: https://${lb_hostname}:9345\" > /etc/rancher/rke2/config.yaml' && \
+        sudo sh -c 'printf \"token: $rke2_token\ntls-san:\n  - ${lb_hostname}\" > /etc/rancher/rke2/config.yaml'"
     fi
     echo "Installing RKE2..."
     ssh -o "StrictHostKeyChecking=no" -l $ssh_username $ip "curl -sfL https://get.rke2.io -o /tmp/install.sh; sudo INSTALL_RKE2_CHANNEL=${downstream_kubernetes_version} sh /tmp/install.sh"

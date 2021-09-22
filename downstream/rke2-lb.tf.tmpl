@@ -1,6 +1,6 @@
 resource "digitalocean_loadbalancer" "rke2" {
     name = "${var.node_prefix}-lb"
-    region = "${var.region}"
+    region = var.instance_region
 
     forwarding_rule {
         entry_protocol = "tcp"
@@ -15,9 +15,9 @@ resource "digitalocean_loadbalancer" "rke2" {
     }
 
     droplet_ids = [
-        digitalocean_droplet.node1.id,
-        digitalocean_droplet.node2.id,
-        digitalocean_droplet.node3.id
+        digitalocean_droplet.node01.id,
+        digitalocean_droplet.node02.id,
+        digitalocean_droplet.node03.id
     ]
 }
 
