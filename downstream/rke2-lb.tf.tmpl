@@ -1,0 +1,34 @@
+resource "digitalocean_loadbalancer" "rke2" {
+    name = "${var.node_prefix}-lb"
+    region = "${var.region}"
+
+    forwarding_rule {
+        entry_protocol = "tcp"
+        entry_port = "9345"
+        target_protocol = "tcp"
+        target_port = "9345"
+    }
+
+    healthcheck {
+        port = 22
+        protocol = "tcp"
+    }
+
+    droplet_ids = [
+        digitalocean_droplet.node1.id,
+        digitalocean_droplet.node2.id,
+        digitalocean_droplet.node3.id
+    ]
+}
+
+resource "cloudflare_record" "rancherrecord" {
+    zone_id = var.zone_id
+    name = "${var.node_prefix}-lb.${var.rootdomain}"
+    type = "A"
+    value = digitalocean_loadbalancer.rke2.ip
+    ttl = 60
+}
+
+output "lb_name" {
+    value = cloudflare_record.rancherrecord.hostname
+}

@@ -59,7 +59,19 @@ variable "ssh_users" {
 variable "rootdomain" {
     type = string
     description = "Domain to use"
-    default = "do.support.rancher.space"
+    default = "lab.hawton.cloud"
+}
+
+variable "zone_id" {
+    type = string
+    description = "Cloudflare Zone ID"
+    default = "6e22a4dfa8e964495306011198901a37"
+}
+
+variable "node_prefix" {
+    type = string
+    description = "Prefix for node names"
+    default = ""
 }
 
 variable "install_docker" {

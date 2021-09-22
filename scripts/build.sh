@@ -211,6 +211,11 @@ variable "rootdomain" {
     default = "$domain_name"
 }
 
+# Node prefix
+variable "node_prefix" {
+    default = "$node_prefix"
+}
+
 variable "do_tag" {
     default = "$do_tag"
 }
@@ -218,6 +223,7 @@ variable "do_tag" {
 
   cat >downstream/terraform.tfvars <<!TFVARS!
 do_token = "$do_token"
+cloudflare_api_token = "$cloudflare_token"
 !TFVARS!
 
   if [[ $downstream_type != "rke" ]]; then

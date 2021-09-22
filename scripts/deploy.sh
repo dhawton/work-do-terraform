@@ -125,6 +125,9 @@ function deploy_downstream() {
   echo ""
   echo "Deploying Downstream Cluster"
   cd downstream
+  if [[ $downstream_type == "rke2" ]]; then
+    mv rke2-lb.tf.tmpl rke2-lb.tf
+  fi
   terraform init
   terraform apply
 

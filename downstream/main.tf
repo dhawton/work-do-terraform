@@ -3,11 +3,17 @@ terraform {
         digitalocean = {
             source = "digitalocean/digitalocean"
         }
+        cloudflare = {
+            source = "cloudflare/cloudflare"
+        }
     }
 }
 
 provider "digitalocean" {
   token = var.do_token
+}
+provider "cloudflare"{
+    api_token = var.cloudflare_api_token
 }
 
 resource "digitalocean_droplet" "node01" {

@@ -4,6 +4,7 @@
 . gen-cluster-common.sh
 
 rke2_token=$(date +%s | sha256sum | base64 | head -c 16 ; echo)
+lb_hostname=$(cat terraform.tfstate | jq -r '.outputs.lb_name.value')
 
 function do_install() {
     local first_node=$1
