@@ -22,7 +22,6 @@ resource "digitalocean_droplet" "rancher" {
     image = var.instance_image
     region = var.instance_region
     size = var.instance_type
-    private_networking = true
     user_data = data.template_cloudinit_config.config.rendered
     tags = [var.do_tag]
 }

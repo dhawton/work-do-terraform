@@ -21,7 +21,6 @@ resource "digitalocean_droplet" "node01" {
     image = var.instance_image
     region = var.instance_region
     size = var.instance_type
-    private_networking = true
     user_data = data.template_cloudinit_config.config.rendered
     tags = [var.do_tag]
 }
@@ -31,7 +30,6 @@ resource "digitalocean_droplet" "node02" {
     image = var.instance_image
     region = var.instance_region
     size = var.instance_type
-    private_networking = true
     user_data = data.template_cloudinit_config.config.rendered
     tags = [var.do_tag]
 }
@@ -41,7 +39,6 @@ resource "digitalocean_droplet" "node03" {
     image = var.instance_image
     region = var.instance_region
     size = var.instance_type
-    private_networking = true
     user_data = data.template_cloudinit_config.config.rendered
     tags = [var.do_tag]
 }
